@@ -24,3 +24,12 @@ RUN a2enmod rewrite
 
 # --- Étape 5: Définir le répertoire de travail ---
 WORKDIR /var/www/html
+
+# Copier notre script de démarrage de production
+COPY docker-config/entrypoint-prod.sh /usr/local/bin/entrypoint-prod.sh
+
+# Le rendre exécutable
+RUN chmod +x /usr/local/bin/entrypoint-prod.sh
+
+# Définir ce script comme la commande que le conteneur doit lancer au démarrage
+CMD ["entrypoint-prod.sh"]
