@@ -1,0 +1,6 @@
+# python/requirements.txt
+Flask
+Flask
+opencv-python-headless
+numpy
+Flask-Cors

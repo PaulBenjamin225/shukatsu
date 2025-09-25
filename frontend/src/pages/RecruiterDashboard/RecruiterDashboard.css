@@ -1,0 +1,157 @@
+/* src/pages/RecruiterDashboard/RecruiterDashboard.css */
+
+.dashboard-container {
+  width: 100%;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap; /* Permet au bouton de passer à la ligne sur mobile */
+  gap: 15px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #1a2b4d;
+}
+
+.btn-create-offer {
+  padding: 12px 20px;
+  background-color: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+}
+
+.btn-create-offer:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.offers-list {
+  display: grid;
+  /* Crée une grille de cartes qui s'adapte automatiquement */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.offer-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.offer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.offer-card-header {
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.offer-card-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.offer-status {
+  background-color: #eaf7ec;
+  color: #28a745;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.offer-card-body {
+  padding: 20px;
+  color: #666;
+  flex-grow: 1; /* Permet à cette partie de s'étendre */
+}
+
+.offer-card-footer {
+  padding: 20px;
+  background-color: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.applications-count {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.applications-count strong {
+  font-size: 1.5rem;
+  color: #1a2b4d;
+}
+.applications-count span {
+  font-size: 0.6rem;
+  color: #777;
+}
+
+.btn-view-results {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-view-results:hover {
+  background-color: #0056b3;
+}
+
+.no-offers-message {
+  grid-column: 1 / -1; /* Prend toute la largeur de la grille */
+  text-align: center;
+  padding: 50px;
+  background-color: #fff;
+  border-radius: 10px;
+}
+
+.error-message {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.offer-actions {
+  display: flex;
+  gap: 10px;
+}
+.btn-delete {
+  padding: 5px 10px;
+  background-color: transparent;
+  color: #dc3545;
+  text-decoration: none;
+  border: 1px solid #dc3545;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-delete:hover {
+  background-color: #dc3545;
+  color: white;
+}

@@ -1,0 +1,39 @@
+/* src/pages/TestPage/TestPage.css */
+.test-page-container { 
+    display: flex; 
+    gap: 20px; 
+}
+.qcm-main-panel { flex: 3; }
+.proctoring-panel { 
+    flex: 1; 
+    background: #f0f0f0; 
+    padding: 15px; 
+    border-radius: 8px; 
+    height: fit-content; 
+}
+.proctoring-panel h3 { margin-top: 0; }
+.proctoring-panel video { width: 100%; 
+    border-radius: 5px; 
+}
+.question-block { margin-bottom: 30px; }
+.answer-label { display: block; 
+    margin: 5px 0; 
+    padding: 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 5px; 
+    cursor: pointer; 
+}
+.answer-label:has(input:checked) { 
+    background-color: #e7f1ff; 
+    border-color: #007bff; 
+}
+.submit-test-btn { padding: 15px 30px; 
+    font-size: 1.2rem; 
+    background-color: #28a745; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    margin-top: 20px; 
+}
+.test-status.error { color: #dc3545; }

@@ -1,0 +1,42 @@
+# docker-compose.yml
+
+services:
+# Service 1: Le serveur Web avec PHP
+  app:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    container_name: qcm_app_php
+    volumes:
+      - ./php:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+
+# Service 2: La base de données MySQL
+  db:
+    image: mysql:8.0
+    container_name: qcm_app_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: qcm_proctoring
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # Service 3: Le microservice de proctoring en Python
+  proctoring_service:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    container_name: qcm_app_python
+    volumes:
+      - ./python:/app
+    ports:
+      - "5000:5000"
+
+volumes:
+  db_data:

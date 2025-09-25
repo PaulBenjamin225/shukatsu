@@ -1,0 +1,183 @@
+/* src/pages/HomePage/HomePage.css */
+
+/* --- Import d'une police web moderne (optionnel mais recommandé) --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+/* --- Style de base --- */
+body {
+  font-family: 'Poppins', sans-serif; /* On applique la police importée */
+  background-color: #f4f7fc; /* Un fond très légèrement grisé pour contraster */
+  margin: 0;
+}
+
+/* --- Conteneur principal --- */
+.home-container {
+  width: 90%; /* Prend 90% de la largeur, plus adapté pour le responsive */
+  max-width: 1300px;
+  min-height: 80vh; /* Hauteur minimale de 80% de l'écran, plus flexible */
+  margin: 5vh auto; /* Marge verticale en % de la hauteur de l'écran */
+  
+  background-color: white; 
+  border-radius: 20px; /* Coins un peu plus arrondis */
+  box-shadow: 0 15px 40px rgba(52, 73, 94, 0.1);
+  padding: 30px 50px;
+
+  display: flex; /* Utilisation de flexbox pour l'organisation interne */
+  flex-direction: column;
+}
+
+/* --- HEADER --- */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo img {
+  height: 100px; /* Un peu plus petit pour un look plus fin */
+  transition: transform 0.3s ease;
+}
+.logo img:hover {
+  transform: scale(1.05);
+}
+
+.home-nav {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #555;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid transparent; /* Bordure transparente pour éviter le décalage au survol */
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #0056b3;
+  border-color: #ddd;
+}
+
+/* Style spécial pour le bouton "Connexion" */
+.nav-link-primary {
+  background-color: #16055e;
+  color: white;
+  border-color: #16055e;
+}
+.nav-link-primary:hover {
+  background-color: #3b18d1;
+  color: white;
+  border-color: #3b18d1;
+}
+
+
+/* --- CONTENU PRINCIPAL (les 2 colonnes) --- */
+.main-content {
+  display: flex;
+  align-items: center;
+  flex-grow: 1; /* Permet au main de prendre toute la place restante en hauteur */
+  gap: 50px;
+}
+
+.text-content {
+  flex: 1.2; /* Donne un peu plus de place au texte */
+  animation: fadeIn 1s ease-in-out;
+}
+
+.illustration-content {
+  flex: 1;
+  animation: slideIn 1s ease-in-out;
+}
+
+.text-content h1 {
+  font-size: 4.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #16055e;
+  margin-bottom: 0;
+  line-height: 1.1;
+}
+
+
+
+.text-content p {
+  font-size: 0.7rem;
+  font-family: cursive;
+  color: #666;
+  line-height: 1.7;
+  margin-bottom: 40px;
+  text-align:left;
+  margin-left: 10px;
+}
+
+.cta-container {
+  display: flex;
+  gap: 15px;
+}
+
+.cta-button {
+  padding: 12px 30px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+
+
+.illustration-content img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+.illustration-content img:hover {
+  transform: scale(1.05);
+}
+
+/* Animations pour un effet dynamique */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Responsive pour les petits écrans --- */
+@media (max-width: 992px) {
+  .main-content {
+    flex-direction: column; /* Les colonnes passent l'une en dessous de l'autre */
+    text-align: center;
+  }
+  .text-content {
+    order: 2; /* Met le texte après l'image sur mobile */
+  }
+  .illustration-content {
+    order: 1;
+  }
+  .cta-container {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .home-container {
+    padding: 20px;
+  }
+  .text-content h1 {
+    font-size: 3rem;
+  }
+}

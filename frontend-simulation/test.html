@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulation de Test Proctoring</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .hidden { display: none; }
+        #qcm-area, #login-area, #results-area { border: 1px solid #ccc; padding: 15px; margin-top: 20px; }
+        video { border: 2px solid black; }
+        #proctoring-log { height: 100px; overflow-y: scroll; border: 1px solid #eee; padding: 5px; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h1>Simulation de Passage de QCM</h1>
+
+    <!-- SECTION DE CONNEXION -->
+    <div id="login-area">
+        <h2>Étape 1: Connexion du Candidat</h2>
+        <input type="email" id="email" value="candidate@test.com">
+        <input type="password" id="password" value="password123">
+        <button id="login-btn">Se Connecter</button>
+        <p id="login-status"></p>
+    </div>
+
+    <!-- SECTION DE DÉMARRAGE DU TEST -->
+    <div id="start-area" class="hidden">
+        <h2>Étape 2: Démarrer le Test pour l'Offre N°1</h2>
+        <label><input type="checkbox" id="consent"> J'accepte que ma webcam soit utilisée pour la surveillance.</label>
+        <br><br>
+        <button id="apply-btn">Créer la session et Démarrer le Test</button>
+        <p id="apply-status"></p>
+    </div>
+
+    <!-- SECTION DU QCM -->
+    <div id="qcm-area" class="hidden">
+        <h2 id="qcm-title"></h2>
+        <p>Temps restant: <span id="timer">--:--</span></p>
+        <div id="questions-container"></div>
+        <button id="submit-btn">Soumettre mes réponses</button>
+    </div>
+
+    <!-- SECTION DES RÉSULTATS -->
+    <div id="results-area" class="hidden">
+        <h2>Test Terminé !</h2>
+        <p>Votre score final est de : <strong id="final-score"></strong> / 100</p>
+    </div>
+
+    <!-- SECTION DE SURVEILLANCE -->
+    <div id="proctoring-area" class="hidden">
+        <h3>Surveillance Automatisée</h3>
+        <video id="webcam" width="320" height="240" autoplay muted></video>
+        <h4>Log des événements:</h4>
+        <div id="proctoring-log"></div>
+    </div>
+
+
+<script>
+    // ----- VARIABLES GLOBALES -----
+    const API_BASE_URL = 'http://localhost:8000/api';
+    const PROCTORING_API_URL = 'http://localhost:5000/analyze';
+    let authToken = null;
+    let testSessionId = null;
+    let proctoringInterval = null;
+
+    // ----- ÉLÉMENTS DU DOM -----
+    const loginBtn = document.getElementById('login-btn');
+    const applyBtn = document.getElementById('apply-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const webcamElement = document.getElementById('webcam');
+    const proctoringLog = document.getElementById('proctoring-log');
+
+    // ----- LOGIQUE DE CONNEXION -----
+    loginBtn.addEventListener('click', async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        const response = await fetch(`${API_BASE_URL}/login`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            authToken = data.access_token;
+            document.getElementById('login-status').innerText = 'Connecté avec succès !';
+            document.getElementById('login-area').classList.add('hidden');
+            document.getElementById('start-area').classList.remove('hidden');
+        } else {
+            document.getElementById('login-status').innerText = 'Erreur de connexion.';
+        }
+    });
+
+    // ----- LOGIQUE DE DÉMARRAGE DU TEST -----
+    applyBtn.addEventListener('click', async () => {
+        if (!document.getElementById('consent').checked) {
+            alert("Vous devez donner votre consentement pour commencer.");
+            return;
+        }
+
+        // 1. Créer la session de test
+        const applyResponse = await fetch(`${API_BASE_URL}/job-offers/1/apply`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ consent: true })
+        });
+        
+        const applyData = await applyResponse.json();
+        if (!applyResponse.ok) {
+            document.getElementById('apply-status').innerText = `Erreur: ${applyData.message}`;
+            return;
+        }
+        testSessionId = applyData.session.id;
+
+        // 2. Démarrer le test
+        const startResponse = await fetch(`${API_BASE_URL}/test-sessions/${testSessionId}/start`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const startData = await startResponse.json();
+        if (startResponse.ok) {
+            document.getElementById('start-area').classList.add('hidden');
+            document.getElementById('qcm-area').classList.remove('hidden');
+            document.getElementById('proctoring-area').classList.remove('hidden');
+            
+            displayQCM(startData);
+            startWebcamAndProctoring();
+        } else {
+            document.getElementById('apply-status').innerText = `Erreur: ${startData.message}`;
+        }
+    });
+    
+    // ----- AFFICHAGE DU QCM ET CHRONO -----
+    function displayQCM(data) {
+        document.getElementById('qcm-title').innerText = data.qcm.title;
+        const container = document.getElementById('questions-container');
+        container.innerHTML = '';
+        data.qcm.questions.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            let answersHtml = '';
+            q.answers.forEach(a => {
+                answersHtml += `<label><input type="radio" name="question_${q.id}" value="${a.id}"> ${a.answer_text}</label><br>`;
+            });
+            questionDiv.innerHTML = `<p><b>${index + 1}. ${q.question_text}</b></p>${answersHtml}`;
+            container.appendChild(questionDiv);
+        });
+
+        // Démarrer le chrono
+        let duration = data.duration_minutes * 60;
+        const timerElement = document.getElementById('timer');
+        setInterval(() => {
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
+            timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (--duration < 0) {
+                // Le temps est écoulé, on soumet automatiquement
+                submitBtn.click();
+            }
+        }, 1000);
+    }
+
+    // ----- SURVEILLANCE WEBCAM -----
+    async function startWebcamAndProctoring() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            webcamElement.srcObject = stream;
+
+            proctoringInterval = setInterval(analyzeWebcamFrame, 5000); // Analyse toutes les 5 secondes
+        } catch (err) {
+            logProctoringEvent('Erreur Webcam! La surveillance est désactivée.');
+        }
+    }
+
+    async function analyzeWebcamFrame() {
+        const canvas = document.createElement('canvas');
+        canvas.width = webcamElement.videoWidth;
+        canvas.height = webcamElement.videoHeight;
+        canvas.getContext('2d').drawImage(webcamElement, 0, 0);
+        
+        canvas.toBlob(async (blob) => {
+            const formData = new FormData();
+            formData.append('image', blob, 'frame.jpg');
+
+            const response = await fetch(PROCTORING_API_URL, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            
+            if (data.status === 'anomaly_detected') {
+                const eventType = data.anomalies[0];
+                const details = `Nombre de visages: ${data.face_count}`;
+                logProctoringEvent(`Anomalie détectée: ${eventType}`);
+                
+                // Envoyer le rapport d'incident à Laravel
+                await fetch(`${API_BASE_URL}/test-sessions/${testSessionId}/proctoring-event`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ event_type: eventType, details: details })
+                });
+            } else {
+                logProctoringEvent('Statut OK.');
+            }
+        }, 'image/jpeg');
+    }
+
+    function logProctoringEvent(message) {
+        proctoringLog.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${message}</div>`;
+        proctoringLog.scrollTop = proctoringLog.scrollHeight;
+    }
+
+    // ----- SOUMISSION DES RÉPONSES -----
+    submitBtn.addEventListener('click', async () => {
+        clearInterval(proctoringInterval); // Arrêter la surveillance
+        
+        const responses = [];
+        const questionElements = document.querySelectorAll('#questions-container > div');
+        questionElements.forEach(qDiv => {
+            const selectedAnswer = qDiv.querySelector('input[type="radio"]:checked');
+            if (selectedAnswer) {
+                const questionId = selectedAnswer.name.split('_')[1];
+                responses.push({
+                    question_id: parseInt(questionId),
+                    answer_id: parseInt(selectedAnswer.value)
+                });
+            }
+        });
+
+        const response = await fetch(`${API_BASE_URL}/test-sessions/${testSessionId}/submit`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ responses })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            document.getElementById('qcm-area').classList.add('hidden');
+            document.getElementById('proctoring-area').classList.add('hidden');
+            document.getElementById('results-area').classList.remove('hidden');
+            document.getElementById('final-score').innerText = data.final_score;
+        } else {
+            alert("Erreur lors de la soumission.");
+        }
+    });
+
+</script>
+</body>
+</html>

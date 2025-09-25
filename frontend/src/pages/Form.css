@@ -1,0 +1,97 @@
+/* src/pages/Form.css */
+.form-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f7fc;
+}
+.form-container {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #19b321;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555;
+}
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box; /* Important pour que le padding n'augmente pas la largeur */
+}
+.form-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #16055e;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.form-button:hover {
+  background-color: #16055e;
+}
+.form-link {
+  text-align: center;
+  margin-top: 20px;
+}
+.form-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+.form-error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* src/pages/Form.css */
+/* ... (tous vos styles existants) ... */
+
+/* --- Styles pour les boutons radio --- */
+.radio-group {
+  display: flex;
+  justify-content: flex-start; /* Aligne les éléments au début */
+  gap: 20px; /* Espace entre les deux options */
+  margin-top: 10px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center; /* Aligne verticalement le bouton radio et le texte */
+  cursor: pointer;
+  font-weight: normal; /* Le texte n'a pas besoin d'être en gras ici */
+}
+
+/* Style pour l'input radio lui-même */
+.radio-label input[type="radio"] {
+  margin-right: 8px; /* Espace entre le bouton et le texte */
+  width: auto; /* Permet au bouton de prendre sa taille naturelle */
+  
+  /* Pour un look un peu plus moderne */
+  accent-color: #2a08b1;
+  transform: scale(1.2);
+}

@@ -1,0 +1,94 @@
+/* src/pages/OfferResultsPage/OfferResultsPage.css */
+
+.results-container .error-message {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.results-header h1 {
+  margin: 0;
+  color: #1a2b4d;
+}
+
+.back-link {
+  text-decoration: none;
+  font-weight: 600;
+  color: #007bff;
+  transition: color 0.2s;
+}
+.back-link:hover {
+  color: #0056b3;
+}
+
+.table-wrapper {
+  overflow-x: auto; /* Permet au tableau de scroller horizontalement sur mobile */
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow: hidden; 
+}
+
+.results-table th, 
+.results-table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.results-table thead th { 
+  background-color: #f8f9fa; 
+  font-weight: 600;
+  color: #495057;
+}
+
+.results-table tbody tr:last-child td {
+  border-bottom: none; /* Pas de bordure pour la dernière ligne */
+}
+
+.results-table tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+.score-cell {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.btn-contact {
+  display: inline-block;
+  padding: 8px 14px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-contact:hover {
+  background-color: #0056b3;
+}
+
+.no-results-info {
+  padding: 40px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 8px;
+  color: #666;
+}

@@ -1,0 +1,55 @@
+/* src/pages/OfferDetailPage/OfferDetailPage.css */
+.offer-detail-header {
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #ddd;
+}
+.offer-detail-header h1 { margin: 0; }
+.offer-detail-header p { margin: 5px 0 0; color: #666; }
+
+.offer-detail-content {
+  display: flex;
+  gap: 40px;
+}
+
+.offer-main-content { flex: 2; }
+.offer-main-content p { line-height: 1.8; color: #333; }
+
+.offer-sidebar {
+  flex: 1;
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  height: fit-content; /* S'adapte à la hauteur du contenu */
+}
+
+.btn-apply {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-apply:hover { background-color: #0056b3; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .offer-detail-content {
+    flex-direction: column;
+  }
+}
+
+.error-message-box {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}

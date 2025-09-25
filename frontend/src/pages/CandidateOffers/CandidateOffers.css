@@ -1,0 +1,72 @@
+/* src/pages/CandidateOffers/CandidateOffers.css */
+.offers-page-container h1 {
+  color: #1a2b4d;
+  margin-bottom: 5px;
+}
+.offers-page-container > p {
+  color: #666;
+  margin-top: 0;
+  margin-bottom: 40px;
+}
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+
+.offer-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.offer-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.offer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.offer-card-company {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.offer-card-title {
+  font-size: 1.3rem;
+  color: #1a2b4d;
+  margin: 0 0 10px 0;
+}
+
+.offer-card-description {
+  flex-grow: 1; /* Pousse le footer en bas */
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.offer-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.arrow {
+  font-size: 1.5rem;
+  transition: transform 0.3s;
+}
+.offer-card:hover .arrow {
+  transform: translateX(5px);
+}
