@@ -1,7 +1,9 @@
 # php/Dockerfile 
 
 FROM php:8.2-apache
-
+# Activer les modules Apache nécessaires
+RUN a2enmod rewrite
+RUN a2enmod headers
 # --- Étape 1: Installation des dépendances système ---
 # On ajoute dos2unix pour corriger les fins de ligne des scripts créés sur Windows.
 RUN apt-get update && apt-get install -y \
