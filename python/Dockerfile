@@ -19,7 +19,7 @@ COPY . .
 
 # --- 3. Préparation du script de démarrage ---
 # On copie notre script de démarrage depuis le dossier partagé 'docker-config'
-COPY ../docker-config/entrypoint-python-prod.sh /usr/local/bin/entrypoint-python-prod.sh
+COPY docker-config/entrypoint-python-prod.sh /usr/local/bin/entrypoint-python-prod.sh
 
 # On corrige ses fins de ligne (très important)
 RUN dos2unix /usr/local/bin/entrypoint-python-prod.sh
