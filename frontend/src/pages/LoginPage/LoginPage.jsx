@@ -1,8 +1,11 @@
 // src/pages/LoginPage/LoginPage.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './../Form.css'; // On importe le style partagé
+import './../Form.css';
 import { useAuth } from '../../contexts/AuthContext';
+
+// --- On définit la constante en haut, comme dans les autres fichiers ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -20,7 +23,8 @@ function LoginPage() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
+      // --- On utilise la constante ici ---
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,10 +39,8 @@ function LoginPage() {
         throw new Error(data.message || 'Erreur de connexion');
       }
 
-      // 1. On connecte l'utilisateur 
       login(data.user, data.access_token);
       
-      // 2. On le redirige vers la bonne page
       if (data.user.role === 'recruiter') {
         navigate('/recruiter/dashboard');
       } else {

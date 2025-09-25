@@ -1,8 +1,9 @@
-// src/pages/CreateOfferPage/CreateOfferPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import './../Form.css'; // On réutilise le style de base
+import './../Form.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 function CreateOfferPage() {
   const { token } = useAuth();
@@ -10,16 +11,12 @@ function CreateOfferPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  // State pour l'offre d'emploi
   const [offer, setOffer] = useState({ title: '', description: '' });
-  // State pour le QCM
   const [qcm, setQcm] = useState({
     title: '',
     duration_minutes: 15,
     questions: [{ question_text: '', answers: [{ answer_text: '', is_correct: true }, { answer_text: '', is_correct: false }] }]
   });
-
-  // ----- Fonctions pour manipuler le formulaire -----
 
   const handleOfferChange = (e) => setOffer({ ...offer, [e.target.name]: e.target.value });
   const handleQcmChange = (e) => setQcm({ ...qcm, [e.target.name]: e.target.value });
@@ -38,7 +35,6 @@ function CreateOfferPage() {
 
   const handleCorrectAnswerChange = (qIndex, aIndex) => {
     const newQuestions = [...qcm.questions];
-    // On met toutes les autres réponses à 'false' pour cette question
     newQuestions[qIndex].answers.forEach((ans, idx) => ans.is_correct = (idx === aIndex));
     setQcm({ ...qcm, questions: newQuestions });
   };
@@ -52,13 +48,12 @@ function CreateOfferPage() {
 
   const addAnswer = (qIndex) => {
     const newQuestions = [...qcm.questions];
-    if (newQuestions[qIndex].answers.length < 4) { // Limite à 4 réponses
+    if (newQuestions[qIndex].answers.length < 4) {
         newQuestions[qIndex].answers.push({ answer_text: '', is_correct: false });
         setQcm({ ...qcm, questions: newQuestions });
     }
   };
 
-  // ----- Soumission du formulaire -----
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -70,7 +65,7 @@ function CreateOfferPage() {
     };
 
     try {
-        const response = await fetch('http://localhost:8000/api/job-offers', {
+        const response = await fetch(`${API_BASE_URL}/job-offers`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -80,7 +75,13 @@ function CreateOfferPage() {
             body: JSON.stringify(payload)
         });
         const data = await response.json();
-        if(!response.ok) throw new Error(data.message || 'Erreur lors de la création');
+        if(!response.ok) {
+            if (response.status === 422) {
+                const errorMessages = Object.values(data.errors || data).flat().join(' ');
+                throw new Error(`Erreur de validation: ${errorMessages}`);
+            }
+            throw new Error(data.message || 'Erreur lors de la création');
+        }
         
         alert('Offre créée avec succès !');
         navigate('/recruiter/dashboard');

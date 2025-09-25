@@ -1,8 +1,11 @@
-// src/pages/TestPage/TestPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './TestPage.css';
+
+// Définition dynamique des URLs de l'API pour la production et le développement
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const PROCTORING_API_URL = import.meta.env.VITE_PROCTORING_API_URL || 'http://localhost:5000';
 
 function TestPage() {
   const { sessionId } = useParams();
@@ -21,7 +24,7 @@ function TestPage() {
   useEffect(() => {
     const startTest = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/test-sessions/${sessionId}/start`, {
+        const response = await fetch(`${API_BASE_URL}/test-sessions/${sessionId}/start`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -43,15 +46,14 @@ function TestPage() {
       startTest();
     }
 
-    // Nettoyage à la sortie du composant : on arrête la surveillance
+    // Fonction de nettoyage qui s'exécute quand on quitte la page
     return () => {
       clearInterval(proctoringIntervalRef.current);
-      // On arrête aussi la webcam si elle est active
       if (webcamRef.current && webcamRef.current.srcObject) {
         webcamRef.current.srcObject.getTracks().forEach(track => track.stop());
       }
     };
-  }, [sessionId, token]); // Dépendances du useEffect
+  }, [sessionId, token]);
 
   // --- LOGIQUE DE SELECTION DE RÉPONSE ---
   const handleAnswerSelect = (questionId, answerId) => {
@@ -89,17 +91,15 @@ function TestPage() {
         if (!blob) return;
         const formData = new FormData();
         formData.append('image', blob, 'frame.jpg');
-
         try {
-            const response = await fetch('http://localhost:5000/analyze', {
+            const response = await fetch(`${PROCTORING_API_URL}/analyze`, {
                 method: 'POST',
                 body: formData
             });
             const data = await response.json();
-            
             if (data.status === 'anomaly_detected') {
                 const eventType = data.anomalies[0];
-                await fetch(`http://localhost:8000/api/test-sessions/${sessionId}/proctoring-event`, {
+                await fetch(`${API_BASE_URL}/test-sessions/${sessionId}/proctoring-event`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -121,16 +121,12 @@ function TestPage() {
     if (webcamRef.current && webcamRef.current.srcObject) {
         webcamRef.current.srcObject.getTracks().forEach(track => track.stop());
     }
-
     const responsesPayload = Object.keys(userAnswers).map(questionId => ({
         question_id: parseInt(questionId),
         answer_id: userAnswers[questionId]
     }));
-    
-    console.log("Payload envoyé à l'API de soumission :", { responses: responsesPayload });
-
     try {
-        const response = await fetch(`http://localhost:8000/api/test-sessions/${sessionId}/submit`, {
+        const response = await fetch(`${API_BASE_URL}/test-sessions/${sessionId}/submit`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -139,30 +135,26 @@ function TestPage() {
             },
             body: JSON.stringify({ responses: responsesPayload })
         });
-
         const data = await response.json();
-        
         if(!response.ok) {
             if(response.status === 422) {
                 const errorMessages = Object.values(data.errors || {error: ["Format de réponse invalide"]}).flat().join(' ');
                 throw new Error(`Erreur de validation: ${errorMessages}`);
             }
-            throw new Error(data.message || "Une erreur inconnue est survenue lors de la soumission.");
+            throw new Error(data.message || "Une erreur inconnue est survenue.");
         }
-
         navigate(`/candidate/results/${sessionId}`);
-        // Ici, on redirigera vers la page de résultats
-        // navigate(`/candidate/results/${sessionId}`);
-
     } catch(err) {
         setError(err.message);
     }
   };
 
+  // --- Rendu conditionnel ---
   if (loading) return <div className="test-status">Préparation du test...</div>;
   if (error) return <div className="test-status error">ERREUR: {error}</div>;
   if (!qcmData || !qcmData.qcm) return <div className="test-status">Erreur: impossible de charger les données du QCM.</div>;
 
+  // --- JSX de la page ---
   return (
     <div className="test-page-container">
       <div className="qcm-main-panel">
@@ -194,7 +186,6 @@ function TestPage() {
       <div className="proctoring-panel">
         <h3>Surveillance</h3>
         <video ref={webcamRef} autoPlay muted playsInline></video>
-        {/* On pourrait ajouter un log des événements ici plus tard */}
       </div>
     </div>
   );

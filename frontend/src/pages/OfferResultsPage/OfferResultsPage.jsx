@@ -1,8 +1,9 @@
-// src/pages/OfferResultsPage/OfferResultsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './OfferResultsPage.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 function OfferResultsPage() {
   const { offerId } = useParams();
@@ -15,7 +16,7 @@ function OfferResultsPage() {
     if (!token) return;
     const fetchResults = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/recruiter/job-offers/${offerId}/results`, {
+        const response = await fetch(`${API_BASE_URL}/recruiter/job-offers/${offerId}/results`, {
           headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
         });
         if (!response.ok) throw new Error('Erreur lors du chargement des résultats.');
@@ -65,8 +66,6 @@ function OfferResultsPage() {
                   <td className="score-cell">
                     {result.credibility_score !== null ? parseFloat(result.credibility_score).toFixed(2) : 'N/A'} %
                   </td>
-
-
                   <td>
                     <a href={`mailto:${result.candidate.email}?subject=Suite à votre candidature`} className="btn-contact">
                       Contacter

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './RecruiterDashboard.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 function RecruiterDashboard() {
   const { token } = useAuth();
   const [offers, setOffers] = useState([]);
@@ -14,7 +16,7 @@ function RecruiterDashboard() {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost:8000/api/recruiter/dashboard', {
+        const response = await fetch(`${API_BASE_URL}/recruiter/dashboard`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
@@ -43,7 +45,7 @@ function RecruiterDashboard() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/api/job-offers/${offerId}`, {
+      const response = await fetch(`${API_BASE_URL}/job-offers/${offerId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

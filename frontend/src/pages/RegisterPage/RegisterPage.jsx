@@ -1,13 +1,15 @@
 // src/pages/RegisterPage/RegisterPage.jsx
 import React, { useState } from 'react';
-// On importe "useNavigate" ici
 import { Link, useNavigate } from 'react-router-dom'; 
 import './../Form.css';
 import { useAuth } from '../../contexts/AuthContext';
 
+// --- MODIFICATION 1 : Définir l'URL de l'API de manière dynamique ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 function RegisterPage() {
   const { login } = useAuth();
-  const navigate = useNavigate(); // Maintenant, cette ligne est correcte
+  const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
     first_name: '',
@@ -29,7 +31,6 @@ function RegisterPage() {
     setLoading(true);
     setError(null);
 
-    // Ajout de la vérification des mots de passe côté client pour un meilleur feedback
     if (formData.password !== formData.password_confirmation) {
         setError("Les mots de passe ne correspondent pas.");
         setLoading(false);
@@ -37,7 +38,8 @@ function RegisterPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/register', {
+      // --- MODIFICATION 2 : Utiliser la variable d'environnement ---
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,10 +55,8 @@ function RegisterPage() {
         throw new Error(errorMessages || 'Erreur d\'inscription');
       }
 
-      // 1. On connecte l'utilisateur
       login(data.user, data.access_token);
       
-      // 2. On le redirige vers la bonne page
       if (data.user.role === 'recruiter') {
         navigate('/recruiter/dashboard');
       } else {

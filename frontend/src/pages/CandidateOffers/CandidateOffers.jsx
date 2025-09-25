@@ -1,7 +1,8 @@
-// src/pages/CandidateOffers/CandidateOffers.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './CandidateOffers.css'; // On va créer un fichier de style
+import './CandidateOffers.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 function CandidateOffers() {
   const [offers, setOffers] = useState([]);
@@ -11,10 +12,10 @@ function CandidateOffers() {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/job-offers');
+        const response = await fetch(`${API_BASE_URL}/job-offers`);
         if (!response.ok) throw new Error('Erreur de chargement des offres.');
         const data = await response.json();
-        setOffers(data.data); // Données dans la clé 'data' de la pagination
+        setOffers(data.data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,11 +38,9 @@ function CandidateOffers() {
           <p>Il n'y a aucune offre disponible pour le moment.</p>
         ) : (
           offers.map(offer => (
-            // La carte entière est maintenant un lien
             <Link to={`/candidate/offer/${offer.id}`} key={offer.id} className="offer-card-link">
               <div className="offer-card">
                 <div className="offer-card-company">
-                  {/* On peut ajouter le nom de l'entreprise plus tard si on l'ajoute au modèle User/Recruiter */}
                   Publié par {offer.recruiter.first_name} {offer.recruiter.last_name}
                 </div>
                 <h3 className="offer-card-title">{offer.title}</h3>
