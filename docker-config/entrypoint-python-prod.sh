@@ -1,8 +1,17 @@
 #!/bin/sh
 
 # On se place dans le bon dossier
-cd /app
+cd /var/www/html
 
-# On lance Gunicorn depuis le bon dossier
-echo "--- Démarrage du serveur Gunicorn ---"
-exec gunicorn --bind 0.0.0.0:$PORT app:app
+# On efface l'ancien cache de configuration et on en crée un nouveau
+# à partir des variables d'environnement actuelles.
+echo "--- Mise en cache de la configuration ---"
+php artisan config:cache
+
+# On lance les migrations
+echo "--- Lancement des migrations ---"
+php artisan migrate --force
+
+# On lance le serveur Apache.
+echo "--- Démarrage du serveur Apache ---"
+exec apache2-foreground
