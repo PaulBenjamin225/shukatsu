@@ -3,12 +3,8 @@
 # On se place dans le bon dossier
 cd /var/www/html
 
-# On lance les migrations
-echo "--- Lancement des migrations ---"
+# On exécute les migrations (c'est indispensable)
 php artisan migrate --force
 
-# On lance le serveur Apache.
-# "exec" est important, il remplace le processus du script par celui d'Apache,
-# ce qui permet à Render de le superviser correctement.
-echo "--- Démarrage du serveur Apache ---"
+# On lance Apache
 exec apache2-foreground
