@@ -3,10 +3,13 @@
 # On se place dans le bon dossier
 cd /var/www/html
 
-# On efface l'ancien cache de configuration et on en crée un nouveau
-# à partir des variables d'environnement actuelles.
-echo "--- Mise en cache de la configuration ---"
-php artisan config:cache
+# --- NETTOYAGE COMPLET DES CACHES ---
+# C'est la partie la plus importante pour résoudre l'erreur 404
+echo "--- Nettoyage des caches Laravel (config, route, cache) ---"
+php artisan config:clear
+php artisan route:clear
+php artisan cache:clear
+# --- FIN DU NETTOYAGE ---
 
 # On lance les migrations
 echo "--- Lancement des migrations ---"
