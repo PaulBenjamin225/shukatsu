@@ -1,43 +1,41 @@
-# php/Dockerfile - VERSION FINALE QUI COPIE LE CODE
+# php/Dockerfile 
 
 FROM php:8.2-apache
-
-# 1. Dépendances système
+# Activer les modules Apache nécessaires
+RUN a2enmod rewrite
+RUN a2enmod headers
+# --- Étape 1: Installation des dépendances système ---
+# On ajoute dos2unix pour corriger les fins de ligne des scripts créés sur Windows.
 RUN apt-get update && apt-get install -y \
-    git zip unzip libzip-dev dos2unix \
+    git \
+    zip \
+    unzip \
+    libzip-dev \
+    dos2unix \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Dépendances PHP
+# --- Étape 2: Installation des extensions PHP ---
 RUN docker-php-ext-install pdo_mysql zip
 
-# 3. Composer
+# --- Étape 3: Installation de Composer ---
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# 4. Configuration Apache
-RUN a2enmod rewrite headers
+# --- Étape 4: Configuration d'Apache ---
 COPY docker-config/apache/my-site.conf /etc/apache2/sites-available/000-default.conf
+RUN a2enmod rewrite
 
-# 5. Préparation de l'application
+# --- Étape 5: Définir le répertoire de travail ---
 WORKDIR /var/www/html
 
-# --- COPIE DES FICHIERS DE L'APPLICATION ---
-# On copie d'abord les fichiers de dépendances pour optimiser le cache Docker
-COPY php/composer.json php/composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader
-
-# Ensuite, on copie tout le reste du code Laravel
-COPY php/ .
-
-# On génère l'autoloader
-RUN composer dump-autoload --optimize
-
-# 6. Préparation du script de démarrage
+# --- Étape 6: Préparation du script de démarrage ---
+# Copier notre script de démarrage de production
 COPY docker-config/entrypoint-prod.sh /usr/local/bin/entrypoint-prod.sh
+
+# Convertir les fins de ligne du script au format Unix (LF)
 RUN dos2unix /usr/local/bin/entrypoint-prod.sh
+
+# Le rendre exécutable
 RUN chmod +x /usr/local/bin/entrypoint-prod.sh
 
-# 7. Permissions
-RUN chown -R www-data:data storage bootstrap/cache
-
-# 8. Commande de démarrage
+# Définir ce script comme la commande que le conteneur doit lancer au démarrage
 CMD ["entrypoint-prod.sh"]
