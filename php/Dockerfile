@@ -1,45 +1,43 @@
-# php/Dockerfile - VERSION AUTONOME AVEC GIT CLONE
+# php/Dockerfile - VERSION FINALE QUI COPIE LE CODE
 
-# Étape 1: Image de base avec les outils
-FROM php:8.2-apache AS base
+FROM php:8.2-apache
+
+# 1. Dépendances système
 RUN apt-get update && apt-get install -y \
-    git \
-    zip \
-    unzip \
-    libzip-dev \
-    dos2unix \
+    git zip unzip libzip-dev dos2unix \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-RUN a2enmod rewrite headers
+
+# 2. Dépendances PHP
+RUN docker-php-ext-install pdo_mysql zip
+
+# 3. Composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# Étape 2: Cloner le code source
-FROM base AS source
-WORKDIR /app
-# Render injecte ces variables d'environnement. On les utilise pour cloner.
-RUN git clone --depth 1 --branch $RENDER_GIT_BRANCH $RENDER_GIT_REPO .
+# 4. Configuration Apache
+RUN a2enmod rewrite headers
+COPY docker-config/apache/my-site.conf /etc/apache2/sites-available/000-default.conf
 
-# Étape 3: Installer les dépendances
-FROM source AS dependencies
-WORKDIR /app/php
-RUN composer install --no-dev --optimize-autoloader
-
-# Étape 4: Image finale de production
-FROM base AS final
+# 5. Préparation de l'application
 WORKDIR /var/www/html
 
-# On copie les dépendances installées
-COPY --from=dependencies /app/php/vendor ./vendor
-# On copie le code source
-COPY --from=source /app/php .
-# On copie la configuration Apache
-COPY --from=source /app/docker-config/apache/my-site.conf /etc/apache2/sites-available/000-default.conf
-# On copie le script de démarrage
-COPY --from=source /app/docker-config/entrypoint-prod.sh /usr/local/bin/entrypoint-prod.sh
+# --- COPIE DES FICHIERS DE L'APPLICATION ---
+# On copie d'abord les fichiers de dépendances pour optimiser le cache Docker
+COPY php/composer.json php/composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader
 
+# Ensuite, on copie tout le reste du code Laravel
+COPY php/ .
+
+# On génère l'autoloader
+RUN composer dump-autoload --optimize
+
+# 6. Préparation du script de démarrage
+COPY docker-config/entrypoint-prod.sh /usr/local/bin/entrypoint-prod.sh
 RUN dos2unix /usr/local/bin/entrypoint-prod.sh
 RUN chmod +x /usr/local/bin/entrypoint-prod.sh
 
-# On donne les bonnes permissions
-RUN chown -R www-data:www-data storage bootstrap/cache
+# 7. Permissions
+RUN chown -R www-data:data storage bootstrap/cache
 
+# 8. Commande de démarrage
 CMD ["entrypoint-prod.sh"]
