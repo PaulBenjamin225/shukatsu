@@ -1,0 +1,11 @@
+# Dossiers de dépendances
+/php/vendor/
+/frontend/node_modules/
+
+# Fichiers d'environnement
+.env
+/php/.env
+/python/.env
+
+# Fichiers de build
+/frontend/dist/
