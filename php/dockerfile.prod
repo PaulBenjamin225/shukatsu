@@ -1,0 +1,33 @@
+# dockerfile.prod - VERSION FINALE AVEC ENTRYPOINT
+
+# On part d'une image optimisée qui contient déjà PHP et le serveur FrankenPHP
+FROM dunglas/frankenphp:1.2-php8.2-laravel
+
+# On installe les dépendances système dont on a besoin (dos2unix)
+RUN apt-get update && apt-get install -y dos2unix && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# On s'assure que les extensions PHP sont là
+RUN install-php-extensions pdo_mysql zip
+
+# On définit le répertoire de travail
+WORKDIR /app
+
+# On copie tout le code de l'application Laravel
+COPY ./php .
+
+# On installe les dépendances Composer
+RUN composer install --no-interaction --no-dev --optimize-autoloader
+
+# --- PRÉPARATION DU SCRIPT DE DÉMARRAGE ---
+# On copie notre script
+COPY ./docker-config/entrypoint-octane.sh /usr/local/bin/entrypoint-octane.sh
+# On corrige les fins de ligne
+RUN dos2unix /usr/local/bin/entrypoint-octane.sh
+# On le rend exécutable
+RUN chmod +x /usr/local/bin/entrypoint-octane.sh
+
+# On donne les bonnes permissions
+RUN chown -R frankenphp:frankenphp /app/storage /app/bootstrap/cache
+
+# On définit notre script comme commande de démarrage par défaut
+CMD ["entrypoint-octane.sh"]
