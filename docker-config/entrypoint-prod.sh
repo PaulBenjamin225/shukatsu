@@ -1,24 +1,12 @@
 #!/bin/sh
 
+# On se place dans le bon dossier
 cd /var/www/html
 
-# ... (génération de la clé, etc.)
-
-echo "--- Mise en cache de la configuration et des routes ---"
-php artisan config:cache
-php artisan route:cache
-
+# On utilise le chemin absolu vers PHP pour être sûr
 echo "--- Lancement des migrations ---"
-php artisan migrate --force
+/usr/local/bin/php artisan migrate --force
 
-# --- AJOUT IMPORTANT ---
-# On s'assure que l'application n'est plus en mode maintenance
-echo "--- Activation de l'application ---"
-php artisan up
-# --- FIN DE L'AJOUT ---
-
-# On donne les permissions
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
+# On lance Apache
 echo "--- Démarrage du serveur Apache ---"
 exec apache2-foreground
